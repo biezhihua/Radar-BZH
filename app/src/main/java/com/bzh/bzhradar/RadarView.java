@@ -105,10 +105,6 @@ public class RadarView extends View {
     // 画各个角对应的文字
     // 默认从最右方开始
     private void drawEachVertexText(Canvas canvas) {
-
-//        int saveID_2 = canvas.saveLayer(0, 0, mCenterX * 2, mCenterY * 2, null, Canvas.ALL_SAVE_FLAG);
-
-
         // 文字尺寸
         mTextPaint.setTextSize(mMaxRadius * 0.15F);
 
@@ -134,108 +130,36 @@ public class RadarView extends View {
 
             if (offsetAngle > 0 && offsetAngle < Math.PI / 2) {
                 // 第四象限
-
                 layerCenterX = (int) (nextVertexX + textWidth / 2);
                 layerCenterY = (int) (nextVertexY + textHeight);
-
-//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
-//                canvas.translate(layerCenterX, layerCenterY);
-//                canvas.rotate(-degrees);
-//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
-//                canvas.restoreToCount(layer);
-
-//                canvas.drawText(mTitles[i], nextVertexX + textWidth / 2, nextVertexY + textHeight, mTextPaint);
             } else if (offsetAngle > Math.PI / 2 && offsetAngle < Math.PI) {
                 // 第三象限
-
                 layerCenterX = (int) (nextVertexX - textWidth / 2);
                 layerCenterY = (int) (nextVertexY + textHeight);
-
-//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
-//                canvas.translate(layerCenterX, layerCenterY);
-//                canvas.rotate(-degrees);
-//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
-//                canvas.restoreToCount(layer);
-
-//                canvas.drawText(mTitles[i], nextVertexX - textWidth / 2, nextVertexY + textHeight, mTextPaint);
             } else if (offsetAngle > Math.PI && offsetAngle < Math.PI * 3 / 2) {
                 // 第二象限
-
                 layerCenterX = (int) (nextVertexX - textWidth / 2);
-                layerCenterY = (int) (nextVertexY - textHeight / 2);
-
-//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
-//                canvas.translate(layerCenterX, layerCenterY);
-//                canvas.rotate(-degrees);
-//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
-//                canvas.restoreToCount(layer);
-
-//                canvas.drawText(mTitles[i], nextVertexX - textWidth / 2, nextVertexY - textHeight / 2, mTextPaint);
+                layerCenterY = (int) (nextVertexY -  (Math.abs(mTextPaint.ascent())) / 2);
             } else if (offsetAngle > Math.PI * 3 / 2 && offsetAngle < Math.PI * 2) {
                 // 第一象限
-
                 layerCenterX = (int) (nextVertexX + textWidth / 2);
                 layerCenterY = (int) (nextVertexY - textHeight / 2);
-
-//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
-//                canvas.translate(layerCenterX, layerCenterY);
-//                canvas.rotate(-degrees);
-//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
-//                canvas.restoreToCount(layer);
-
-//                canvas.drawText(mTitles[i], nextVertexX + textWidth / 2, nextVertexY - textHeight / 2, mTextPaint);
             } else if (offsetAngle == 0) {
                 // X轴正方向
-
                 layerCenterX = (int) (nextVertexX + textWidth);
                 layerCenterY = (int) (nextVertexY + (Math.abs(mTextPaint.ascent())) / 2);
-
-//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
-//                canvas.translate(layerCenterX, layerCenterY);
-//                canvas.rotate(-degrees);
-//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
-//                canvas.restoreToCount(layer);
-
-//                canvas.drawText(mTitles[i], nextVertexX + textWidth, nextVertexY + (Math.abs(mTextPaint.ascent())) / 2, mTextPaint);
             } else if (offsetAngle == Math.PI / 2) {
                 // Y轴负方向
-
                 layerCenterX = (int) (nextVertexX);
                 layerCenterY = (int) (nextVertexY + textHeight);
-
-//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
-//                canvas.translate(layerCenterX, layerCenterY);
-//                canvas.rotate(-degrees);
-//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
-//                canvas.restoreToCount(layer);
-
-//                canvas.drawText(mTitles[i], nextVertexX, nextVertexY + textHeight, mTextPaint);
             } else if (offsetAngle == Math.PI) {
                 // X轴负方向
-
-                layerCenterX = (int) ( nextVertexX - textWidth);
+                layerCenterX = (int) (nextVertexX - textWidth);
                 layerCenterY = (int) (nextVertexY + (Math.abs(mTextPaint.ascent())) / 2);
-
-//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
-//                canvas.translate(layerCenterX, layerCenterY);
-//                canvas.rotate(-degrees);
-//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
-//                canvas.restoreToCount(layer);
-
-//                canvas.drawText(mTitles[i], nextVertexX - textWidth, nextVertexY + (Math.abs(mTextPaint.ascent())) / 2, mTextPaint);
             } else if (offsetAngle == Math.PI * 3 / 2) {
                 // Y轴正方向
-
-                layerCenterX = (int) ( nextVertexX);
+                layerCenterX = (int) (nextVertexX);
                 layerCenterY = (int) (nextVertexY - (Math.abs(mTextPaint.ascent())) / 2);
-
-//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
-//                canvas.translate(layerCenterX, layerCenterY);
-//                canvas.rotate(-degrees);
-//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
-//                canvas.restoreToCount(layer);
-
-//                canvas.drawText(mTitles[i], nextVertexX, nextVertexY - (Math.abs(mTextPaint.ascent())) / 2, mTextPaint);
             }
 
             int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
@@ -245,10 +169,6 @@ public class RadarView extends View {
             canvas.restoreToCount(layer);
 
         }
-
-
-//        canvas.restoreToCount(saveID_2);
-
     }
 
     // 绘制中心到各个角的连接线
