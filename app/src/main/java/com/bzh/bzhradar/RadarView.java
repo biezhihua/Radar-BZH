@@ -113,14 +113,16 @@ public class RadarView extends View {
 
             if (offsetAngle > 0 && offsetAngle < Math.PI / 2) {
                 // 第四象限
+                canvas.drawText(mTitles[i], nextVertexX + textWidth / 2, nextVertexY + textHeight , mTextPaint);
             } else if (offsetAngle > Math.PI / 2 && offsetAngle < Math.PI) {
                 // 第三象限
+                canvas.drawText(mTitles[i], nextVertexX - textWidth / 2, nextVertexY + textHeight , mTextPaint);
             } else if (offsetAngle > Math.PI && offsetAngle < Math.PI * 3 / 2) {
                 // 第二象限
-
+                canvas.drawText(mTitles[i], nextVertexX - textWidth / 2, nextVertexY - textHeight / 2, mTextPaint);
             } else if (offsetAngle > Math.PI * 3 / 2 && offsetAngle < Math.PI * 2) {
                 // 第一象限
-                canvas.drawText(mTitles[i], nextVertexX - textWidth / 2, nextVertexY - textHeight / 2, mTextPaint);
+                canvas.drawText(mTitles[i], nextVertexX + textWidth / 2, nextVertexY - textHeight / 2, mTextPaint);
             }
 
 
