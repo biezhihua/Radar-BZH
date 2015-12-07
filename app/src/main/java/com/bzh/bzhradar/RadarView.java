@@ -22,7 +22,7 @@ import android.view.View;
  */
 public class RadarView extends View {
 
-    private String[] mTitles = {"别", "志", "华", "胡", "玉", "琼"};
+    private String[] mTitles;
 
     // 默认参数
     private int mNormalPolygonVertexNumber; // 正多边形顶角个数
@@ -37,6 +37,8 @@ public class RadarView extends View {
 
     // 绘制各个角的文字画笔
     private Paint mTextPaint;
+    private Canvas canvasRotate;
+    private float degrees;
 
 
     public RadarView(Context context) {
@@ -62,10 +64,6 @@ public class RadarView extends View {
 
     private void init(Context context) {
 
-        mNormalPolygonVertexNumber = 6; // 默认顶角数
-        mOffsetAngle = Math.PI * 2 / mNormalPolygonVertexNumber;
-
-
         // 绘制正多边形路径
         mNormalPolygonPath = new Path();
 
@@ -75,11 +73,10 @@ public class RadarView extends View {
         mNormalPolygonPaint.setStrokeWidth(3);
         mNormalPolygonPaint.setStyle(Paint.Style.STROKE);
 
-
+        // 文字画笔
         mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
         mTextPaint.setStyle(Paint.Style.STROKE);
         mTextPaint.setColor(Color.BLACK);
-
         mTextPaint.setTextAlign(Paint.Align.CENTER);
     }
 
@@ -87,68 +84,187 @@ public class RadarView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        int saveID_1 = canvas.saveLayer(0, 0, mCenterX * 2, mCenterY * 2, null, Canvas.ALL_SAVE_FLAG);
+
+        // 重置画布中心为屏幕中心
+        canvas.translate(mCenterX, mCenterY);
+
+        // 设置旋转角度
+        setCanvasRotate(canvas);
+
         drawNormalPolygon(canvas);
 
         drawCenterToVertexConnectLine(canvas);
 
         drawEachVertexText(canvas);
 
+        canvas.restoreToCount(saveID_1);
+
     }
 
     // 画各个角对应的文字
     // 默认从最右方开始
     private void drawEachVertexText(Canvas canvas) {
-        int save = canvas.save();
-        mTextPaint.setTextSize(mMaxRadius / (mNormalPolygonVertexNumber - 1) * 0.8F);
+
+//        int saveID_2 = canvas.saveLayer(0, 0, mCenterX * 2, mCenterY * 2, null, Canvas.ALL_SAVE_FLAG);
+
+
+        // 文字尺寸
+        mTextPaint.setTextSize(mMaxRadius * 0.15F);
+
+        // 文字高度
         float textHeight = (mTextPaint.descent() - mTextPaint.ascent());
 
         for (int i = 0; i < mNormalPolygonVertexNumber; i++) {
 
+            // 偏移角度
             double offsetAngle = mOffsetAngle * i;
 
-            float nextVertexX = (float) (mCenterX + mMaxRadius * Math.cos(offsetAngle));
-            float nextVertexY = (float) (mCenterY + mMaxRadius * Math.sin(offsetAngle));
+            // 下一个点位置
+            float nextVertexX = (float) (mMaxRadius * Math.cos(offsetAngle));
+            float nextVertexY = (float) (mMaxRadius * Math.sin(offsetAngle));
 
+            // 文字宽度
             float textWidth = mTextPaint.measureText(mTitles[i]);
+
+            int saveLayerLength = (int) Math.sqrt(textWidth * textWidth + textHeight * textHeight);
+
+            int layerCenterX = 0;
+            int layerCenterY = 0;
 
             if (offsetAngle > 0 && offsetAngle < Math.PI / 2) {
                 // 第四象限
-                canvas.drawText(mTitles[i], nextVertexX + textWidth / 2, nextVertexY + textHeight , mTextPaint);
+
+                layerCenterX = (int) (nextVertexX + textWidth / 2);
+                layerCenterY = (int) (nextVertexY + textHeight);
+
+//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
+//                canvas.translate(layerCenterX, layerCenterY);
+//                canvas.rotate(-degrees);
+//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
+//                canvas.restoreToCount(layer);
+
+//                canvas.drawText(mTitles[i], nextVertexX + textWidth / 2, nextVertexY + textHeight, mTextPaint);
             } else if (offsetAngle > Math.PI / 2 && offsetAngle < Math.PI) {
                 // 第三象限
-                canvas.drawText(mTitles[i], nextVertexX - textWidth / 2, nextVertexY + textHeight , mTextPaint);
+
+                layerCenterX = (int) (nextVertexX - textWidth / 2);
+                layerCenterY = (int) (nextVertexY + textHeight);
+
+//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
+//                canvas.translate(layerCenterX, layerCenterY);
+//                canvas.rotate(-degrees);
+//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
+//                canvas.restoreToCount(layer);
+
+//                canvas.drawText(mTitles[i], nextVertexX - textWidth / 2, nextVertexY + textHeight, mTextPaint);
             } else if (offsetAngle > Math.PI && offsetAngle < Math.PI * 3 / 2) {
                 // 第二象限
-                canvas.drawText(mTitles[i], nextVertexX - textWidth / 2, nextVertexY - textHeight / 2, mTextPaint);
+
+                layerCenterX = (int) (nextVertexX - textWidth / 2);
+                layerCenterY = (int) (nextVertexY - textHeight / 2);
+
+//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
+//                canvas.translate(layerCenterX, layerCenterY);
+//                canvas.rotate(-degrees);
+//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
+//                canvas.restoreToCount(layer);
+
+//                canvas.drawText(mTitles[i], nextVertexX - textWidth / 2, nextVertexY - textHeight / 2, mTextPaint);
             } else if (offsetAngle > Math.PI * 3 / 2 && offsetAngle < Math.PI * 2) {
                 // 第一象限
-                canvas.drawText(mTitles[i], nextVertexX + textWidth / 2, nextVertexY - textHeight / 2, mTextPaint);
+
+                layerCenterX = (int) (nextVertexX + textWidth / 2);
+                layerCenterY = (int) (nextVertexY - textHeight / 2);
+
+//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
+//                canvas.translate(layerCenterX, layerCenterY);
+//                canvas.rotate(-degrees);
+//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
+//                canvas.restoreToCount(layer);
+
+//                canvas.drawText(mTitles[i], nextVertexX + textWidth / 2, nextVertexY - textHeight / 2, mTextPaint);
+            } else if (offsetAngle == 0) {
+                // X轴正方向
+
+                layerCenterX = (int) (nextVertexX + textWidth);
+                layerCenterY = (int) (nextVertexY + (Math.abs(mTextPaint.ascent())) / 2);
+
+//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
+//                canvas.translate(layerCenterX, layerCenterY);
+//                canvas.rotate(-degrees);
+//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
+//                canvas.restoreToCount(layer);
+
+//                canvas.drawText(mTitles[i], nextVertexX + textWidth, nextVertexY + (Math.abs(mTextPaint.ascent())) / 2, mTextPaint);
+            } else if (offsetAngle == Math.PI / 2) {
+                // Y轴负方向
+
+                layerCenterX = (int) (nextVertexX);
+                layerCenterY = (int) (nextVertexY + textHeight);
+
+//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
+//                canvas.translate(layerCenterX, layerCenterY);
+//                canvas.rotate(-degrees);
+//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
+//                canvas.restoreToCount(layer);
+
+//                canvas.drawText(mTitles[i], nextVertexX, nextVertexY + textHeight, mTextPaint);
+            } else if (offsetAngle == Math.PI) {
+                // X轴负方向
+
+                layerCenterX = (int) ( nextVertexX - textWidth);
+                layerCenterY = (int) (nextVertexY + (Math.abs(mTextPaint.ascent())) / 2);
+
+//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
+//                canvas.translate(layerCenterX, layerCenterY);
+//                canvas.rotate(-degrees);
+//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
+//                canvas.restoreToCount(layer);
+
+//                canvas.drawText(mTitles[i], nextVertexX - textWidth, nextVertexY + (Math.abs(mTextPaint.ascent())) / 2, mTextPaint);
+            } else if (offsetAngle == Math.PI * 3 / 2) {
+                // Y轴正方向
+
+                layerCenterX = (int) ( nextVertexX);
+                layerCenterY = (int) (nextVertexY - (Math.abs(mTextPaint.ascent())) / 2);
+
+//                int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
+//                canvas.translate(layerCenterX, layerCenterY);
+//                canvas.rotate(-degrees);
+//                canvas.drawText(mTitles[i], 0, 0, mTextPaint);
+//                canvas.restoreToCount(layer);
+
+//                canvas.drawText(mTitles[i], nextVertexX, nextVertexY - (Math.abs(mTextPaint.ascent())) / 2, mTextPaint);
             }
 
+            int layer = canvas.saveLayer(layerCenterX - saveLayerLength, layerCenterY - saveLayerLength, layerCenterX + saveLayerLength, layerCenterY + saveLayerLength, null, Canvas.ALL_SAVE_FLAG);
+            canvas.translate(layerCenterX, layerCenterY);
+            canvas.rotate(-degrees);
+            canvas.drawText(mTitles[i], 0, 0, mTextPaint);
+            canvas.restoreToCount(layer);
 
         }
 
-        canvas.restoreToCount(save);
+
+//        canvas.restoreToCount(saveID_2);
+
     }
 
     // 绘制中心到各个角的连接线
     private void drawCenterToVertexConnectLine(Canvas canvas) {
-        int save = canvas.save();
 
         for (int i = 0; i < mNormalPolygonVertexNumber; i++) {
 
-            float nextVertexX = (float) (mCenterX + mMaxRadius * Math.cos(mOffsetAngle * i));
-            float nextVertexY = (float) (mCenterY + mMaxRadius * Math.sin(mOffsetAngle * i));
+            float nextVertexX = (float) (mMaxRadius * Math.cos(mOffsetAngle * i));
+            float nextVertexY = (float) (mMaxRadius * Math.sin(mOffsetAngle * i));
 
-            canvas.drawLine(mCenterX, mCenterY, nextVertexX, nextVertexY, mNormalPolygonPaint);
+            canvas.drawLine(0, 0, nextVertexX, nextVertexY, mNormalPolygonPaint);
         }
-
-        canvas.restoreToCount(save);
     }
 
     // 绘制正多边形
     private void drawNormalPolygon(Canvas canvas) {
-        int save = canvas.save();
 
         // 获取蜘蛛丝之间的间距
         float gap = mMaxRadius / (mNormalPolygonVertexNumber - 1);
@@ -164,11 +280,11 @@ public class RadarView extends View {
                 //　移动到横轴起始点
                 if (0 == j) {
                     mNormalPolygonPath.reset();
-                    mNormalPolygonPath.moveTo(mCenterX + radius, mCenterY);
+                    mNormalPolygonPath.moveTo(radius, 0);
                 } else {
                     // 根据三角形斜边计算公式计算出下一个顶点的位置
-                    float nextVertexX = (float) (mCenterX + radius * Math.cos(mOffsetAngle * j));
-                    float nextVertexY = (float) (mCenterY + radius * Math.sin(mOffsetAngle * j));
+                    float nextVertexX = (float) (radius * Math.cos(mOffsetAngle * j));
+                    float nextVertexY = (float) (radius * Math.sin(mOffsetAngle * j));
                     mNormalPolygonPath.lineTo(nextVertexX, nextVertexY);
                 }
             }// end for draw normal polygon
@@ -177,7 +293,7 @@ public class RadarView extends View {
 
         } // end for
 
-        canvas.restoreToCount(save);
+
     }
 
     @Override
@@ -187,5 +303,33 @@ public class RadarView extends View {
         mCenterY = h / 2;
         postInvalidate();
         super.onSizeChanged(w, h, oldw, oldh);
+    }
+
+    public void setTitles(String[] mTitles) {
+        this.mTitles = mTitles;
+        mNormalPolygonVertexNumber = mTitles.length; // 默认顶角数
+        mOffsetAngle = Math.PI * 2 / mNormalPolygonVertexNumber;
+        postInvalidate();
+    }
+
+    public void setCanvasRotate(Canvas canvas) {
+
+        if (3 == mNormalPolygonVertexNumber) {
+            degrees = (float) (360 / 6 / 2);
+            canvas.rotate(degrees);
+        } else if (4 == mNormalPolygonVertexNumber) {
+            degrees = (float) (360 / 4 / 2);
+            canvas.rotate(degrees);
+        } else if (5 == mNormalPolygonVertexNumber) {
+            degrees = -(float) (360 / 5 / 2 / 2);
+            canvas.rotate(degrees);
+        } else if (6 == mNormalPolygonVertexNumber) {
+            degrees = 0;
+        } else if (7 == mNormalPolygonVertexNumber) {
+            degrees = (float) (360 / 7 / 2 / 2);
+            canvas.rotate(degrees);
+        }
+
+
     }
 }
