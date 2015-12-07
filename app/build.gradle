@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "com.bzh.bzhradar"
-        minSdkVersion 23
-        targetSdkVersion 23
+        minSdkVersion 19
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
