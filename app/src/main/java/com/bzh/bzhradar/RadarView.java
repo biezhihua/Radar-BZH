@@ -22,7 +22,14 @@ import android.view.View;
  */
 public class RadarView extends View {
 
+    // 各个顶角的名称
     private String[] mTitles;
+
+    // 各项数值的数组，必须和mTitle.length()相等
+    private int[] mValues;
+
+    // 默认最大值
+    private int mDefaultMaxValue = 100;
 
     // 默认参数
     private int mNormalPolygonVertexNumber; // 正多边形顶角个数
@@ -40,6 +47,9 @@ public class RadarView extends View {
     private Canvas canvasRotate;
     private float degrees;
 
+    private Path mRegionPath;
+    private Paint mCirclePaint;
+    private Paint mValuePaint;
 
     public RadarView(Context context) {
         super(context);
@@ -62,11 +72,12 @@ public class RadarView extends View {
         init(context);
     }
 
+
     private void init(Context context) {
 
         // 绘制正多边形路径
         mNormalPolygonPath = new Path();
-
+        mRegionPath = new Path();
         // 绘制正多边形路径画笔
         mNormalPolygonPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
         mNormalPolygonPaint.setColor(Color.GRAY);
@@ -78,6 +89,16 @@ public class RadarView extends View {
         mTextPaint.setStyle(Paint.Style.STROKE);
         mTextPaint.setColor(Color.BLACK);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
+
+        mValuePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        mValuePaint.setStyle(Paint.Style.STROKE);
+        mValuePaint.setStrokeWidth(3);
+        mValuePaint.setStrokeCap(Paint.Cap.ROUND);
+        mValuePaint.setColor(Color.BLUE);
+
+        mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        mCirclePaint.setStyle(Paint.Style.FILL);
+        mCirclePaint.setColor(Color.RED);
     }
 
     @Override
@@ -98,8 +119,39 @@ public class RadarView extends View {
 
         drawEachVertexText(canvas);
 
+        drawRegion(canvas);
+
         canvas.restoreToCount(saveID_1);
 
+    }
+
+    // 画区域
+    private void drawRegion(Canvas canvas) {
+        for (int i = 0; i < mNormalPolygonVertexNumber; i++) {
+
+            // 计算出值占总值的百分比
+            float precent = mValues[i] * 1.0f / mDefaultMaxValue;
+
+            // 偏移角度
+            double offsetAngle = mOffsetAngle * i;
+
+            float pointX = (float) (mMaxRadius * Math.cos(offsetAngle) * precent);
+            float pointY = (float) (mMaxRadius * Math.sin(offsetAngle) * precent);
+            if (0 == i) {
+                mRegionPath.reset();
+                mRegionPath.moveTo(pointX, pointY);
+            } else {
+                mRegionPath.lineTo(pointX, pointY);
+            }
+            canvas.drawCircle(pointX, pointY, 8, mCirclePaint);
+        }
+
+        mRegionPath.close();
+        canvas.drawPath(mRegionPath, mValuePaint);
+
+        mValuePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mValuePaint.setAlpha(127);
+        canvas.drawPath(mRegionPath, mValuePaint);
     }
 
     // 画各个角对应的文字
@@ -139,7 +191,7 @@ public class RadarView extends View {
             } else if (offsetAngle > Math.PI && offsetAngle < Math.PI * 3 / 2) {
                 // 第二象限
                 layerCenterX = (int) (nextVertexX - textWidth / 2);
-                layerCenterY = (int) (nextVertexY -  (Math.abs(mTextPaint.ascent())) / 2);
+                layerCenterY = (int) (nextVertexY - (Math.abs(mTextPaint.ascent())) / 2);
             } else if (offsetAngle > Math.PI * 3 / 2 && offsetAngle < Math.PI * 2) {
                 // 第一象限
                 layerCenterX = (int) (nextVertexX + textWidth / 2);
@@ -252,4 +304,9 @@ public class RadarView extends View {
 
 
     }
+
+    public void setValues(int[] mValues) {
+        this.mValues = mValues;
+    }
 }
+
