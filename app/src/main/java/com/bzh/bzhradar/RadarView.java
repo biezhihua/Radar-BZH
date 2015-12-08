@@ -115,8 +115,11 @@ public class RadarView extends View {
 
     private void drawRegion(Canvas canvas) {
         for (int i = 0; i < mNormalPolygonVertexNumber; i++) {
+
+            // 计算出值占总值的百分比
             float precent = mValues[i] * 1.0f / mMaxValue;
 
+            // 偏移角度
             double offsetAngle = mOffsetAngle * i;
 
             float pointX = (float) (mCenterX + mMaxRadius * Math.cos(offsetAngle) * precent);
@@ -126,7 +129,7 @@ public class RadarView extends View {
             } else {
                 mRegionPath.lineTo(pointX, pointY);
             }
-            canvas.drawCircle(pointX, pointY, 6, mCirclePaint);
+            canvas.drawCircle(pointX, pointY, 8, mCirclePaint);
         }
 
         mRegionPath.close();
