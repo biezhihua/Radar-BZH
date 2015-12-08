@@ -12,7 +12,7 @@ import android.view.View;
 
 /**
  * ========================================================== <br>
- * <b>版权</b>：　　　音悦台 版权所有(c) 2015 <br>
+ * <b>版权</b>：　　　别志华 版权所有(c) 2015 <br>
  * <b>作者</b>：　　　别志华 biezhihua@163.com<br>
  * <b>创建日期</b>：　15-12-7 <br>
  * <b>描述</b>：　　　<br>
@@ -44,7 +44,8 @@ public class RadarView extends View {
 
     // 绘制各个角的文字画笔
     private Paint mTextPaint;
-    private Canvas canvasRotate;
+
+    // 为了让多边形放正所旋转的角度
     private float degrees;
 
     private Path mRegionPath;
@@ -71,7 +72,6 @@ public class RadarView extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context);
     }
-
 
     private void init(Context context) {
 
@@ -102,10 +102,57 @@ public class RadarView extends View {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(getMeasureSize(widthMeasureSpec, Ratio.WIDTH), getMeasureSize(heightMeasureSpec, Ratio.HEIGHT));
+    }
+
+    enum Ratio {
+        WIDTH, HEIGHT
+    }
+
+    private int getMeasureSize(int measureSpec, Ratio ratio) {
+        // 声明临时变量保存测量值
+        int result = 0;
+
+        /*
+         * 获取mode和size
+         */
+        int mode = MeasureSpec.getMode(measureSpec);
+        int size = MeasureSpec.getSize(measureSpec);
+
+        /*
+         * 判断mode的具体值
+         */
+        switch (mode) {
+            case MeasureSpec.EXACTLY:// EXACTLY时直接赋值
+                result = size;
+                break;
+            default:// 默认情况下将UNSPECIFIED和AT_MOST一并处理
+
+                // 如果都是包裹内容，那么就给一个默认值
+                if (ratio == Ratio.WIDTH) {
+                    result = (int) getResources().getDimension(R.dimen.radar_view_default_width);
+                } else if (ratio == Ratio.HEIGHT) {
+                    result = (int) getResources().getDimension(R.dimen.radar_view_default_height);
+                }
+
+                /*
+                 * AT_MOST时判断size和result的大小取小值
+                 */
+                if (mode == MeasureSpec.AT_MOST) {
+                    result = Math.min(result, size);
+                }
+                break;
+        }
+        return result;
+    }
+
+
+    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        int saveID_1 = canvas.saveLayer(0, 0, mCenterX * 2, mCenterY * 2, null, Canvas.ALL_SAVE_FLAG);
+        int saveID_1 = canvas.saveLayer(0 + getPaddingLeft(), 0 + getPaddingTop(), mCenterX * 2, mCenterY * 2, null, Canvas.ALL_SAVE_FLAG);
 
         // 重置画布中心为屏幕中心
         canvas.translate(mCenterX, mCenterY);
@@ -143,7 +190,7 @@ public class RadarView extends View {
             } else {
                 mRegionPath.lineTo(pointX, pointY);
             }
-            canvas.drawCircle(pointX, pointY, 8, mCirclePaint);
+            canvas.drawCircle(pointX, pointY, mMaxRadius / 2 * 0.05F, mCirclePaint);
         }
 
         mRegionPath.close();
@@ -264,24 +311,33 @@ public class RadarView extends View {
             canvas.drawPath(mNormalPolygonPath, mNormalPolygonPaint);
 
         } // end for
-
-
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        mMaxRadius = Math.min(w, h) / 2 * 0.8F;// 获取最大半径
-        mCenterX = w / 2;
-        mCenterY = h / 2;
+
+        // 获得减去padding后实际的宽高
+        int actualW = w - getPaddingLeft() - getPaddingRight();
+        int actualH = h - getPaddingTop() - getPaddingBottom();
+
+        // 获取实际的最大半径
+        mMaxRadius = Math.min(actualW, actualH) / 2 * 0.8F;// 获取最大半径
+
+        // 获取实际的中心点
+        mCenterX = actualW / 2 + getPaddingLeft();
+        mCenterY = actualH / 2 + getPaddingTop();
+
         postInvalidate();
+
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
-    public void setTitles(String[] mTitles) {
+    public RadarView setTitles(String[] mTitles) {
         this.mTitles = mTitles;
         mNormalPolygonVertexNumber = mTitles.length; // 默认顶角数
         mOffsetAngle = Math.PI * 2 / mNormalPolygonVertexNumber;
         postInvalidate();
+        return this;
     }
 
     public void setCanvasRotate(Canvas canvas) {
@@ -305,8 +361,12 @@ public class RadarView extends View {
 
     }
 
-    public void setValues(int[] mValues) {
+    /**
+     * 不要在使用该方法前执行耗时操作，会致使绘制失败
+     */
+    public RadarView setValues(int[] mValues) {
         this.mValues = mValues;
+        return this;
     }
 }
 

@@ -2,7 +2,6 @@ package com.bzh.bzhradar;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -41,29 +40,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        Snackbar.make(fab, item.getTitle(), Snackbar.LENGTH_LONG)
-                .show();
         switch (item.getItemId()) {
             case R.id.action_3:
-                radarView.setTitles(new String[]{"别", "志", "华"});
-                radarView.setValues(new int[]{100, 80, 60});
+                radarView
+                        .setTitles(new String[]{"一", "二", "三"})
+                        .setValues(new int[]{100, 80, 60});
                 break;
             case R.id.action_4:
-                radarView.setTitles(new String[]{"别", "志", "华", "胡"});
-                radarView.setValues(new int[]{100, 80, 60, 40});
+                radarView
+                        .setTitles(new String[]{"一", "二", "三", "四"})
+                        .setValues(new int[]{100, 80, 60, 40});
                 break;
             case R.id.action_5:
-                radarView.setTitles(new String[]{"别", "志", "华", "胡", "玉"});
-                radarView.setValues(new int[]{100, 80, 60, 40, 60});
+                radarView
+                        .setTitles(new String[]{"一", "二", "三", "四", "五"})
+                        .setValues(new int[]{100, 80, 60, 40, 60});
                 break;
             case R.id.action_6:
-                radarView.setTitles(new String[]{"别", "志", "华", "胡", "玉", "琼"});
-                radarView.setValues(new int[]{100, 80, 60, 40, 60, 78});
+                radarView
+                        .setTitles(new String[]{"一", "二", "三", "四", "五", "六"})
+                        .setValues(new int[]{100, 80, 60, 40, 60, 78});
                 break;
             case R.id.action_7:
-                radarView.setTitles(new String[]{"别", "志", "华", "胡", "玉", "琼", "我"});
-                radarView.setValues(new int[]{100, 80, 60, 40, 60, 78, 99});
+                radarView
+                        .setTitles(new String[]{"一", "二", "三", "四", "五", "六", "七"})
+                        .setValues(new int[]{100, 80, 60, 40, 60, 78, 99});
                 break;
 
         }
