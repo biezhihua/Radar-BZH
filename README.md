@@ -4,6 +4,7 @@
 1. 处理了多种多边形的情况
 2. 处理了onMeasure()和padding值
 3. 处理了多边形没有被方正的情况
+4. 处理了文字摆放位置和角度的问题（还有缺陷）
 
 ![选择](https://github.com/biezhihua/BzhRadar/blob/master/picture/0.png)
 
